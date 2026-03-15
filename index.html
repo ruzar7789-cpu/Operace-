@@ -2,97 +2,86 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>RealityWorld | Operativní Terminál</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUTONOMNÍ KLÍČ v4.0</title>
     <style>
-        :root { --neon-blue: #00f2ff; --neon-gold: #ffd700; --bg-dark: #050505; }
-        body { margin: 0; background: var(--bg-dark); color: white; font-family: 'Courier New', monospace; overflow: hidden; }
-        
-        /* Pozadí s efektem matrixu/sítě */
-        .grid-overlay { position: fixed; inset: 0; background-image: linear-gradient(var(--neon-blue) 1px, transparent 1px), linear-gradient(90deg, var(--neon-blue) 1px, transparent 1px); background-size: 50px 50px; opacity: 0.05; pointer-events: none; }
-
-        .terminal-container { height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
-        
-        .header { border-bottom: 2px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .status-light { width: 10px; height: 10px; background: #0f0; border-radius: 50%; box-shadow: 0 0 10px #0f0; display: inline-block; margin-right: 5px; }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: rgba(0, 242, 255, 0.05); border: 1px solid var(--neon-blue); padding: 15px; border-radius: 8px; }
-        .stat-label { font-size: 10px; color: var(--neon-blue); text-transform: uppercase; }
-        .stat-value { font-size: 18px; font-weight: bold; margin-top: 5px; color: var(--neon-gold); }
-
-        .action-zone { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; }
-        
-        .input-glow { width: 100%; max-width: 400px; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-blue); border-radius: 50px; padding: 15px 25px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
-        input { background: transparent; border: none; color: white; width: 100%; font-size: 16px; outline: none; text-align: center; }
-
-        .btn-activate { background: var(--neon-blue); color: black; border: none; padding: 20px 40px; border-radius: 50px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.3s; box-shadow: 0 0 30px var(--neon-blue); }
-        .btn-activate:active { transform: scale(0.95); box-shadow: 0 0 10px var(--neon-blue); }
-
-        .log-area { height: 100px; background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 10px; font-size: 10px; overflow-y: auto; color: #888; }
+        body { background: #000; color: #0dff00; font-family: 'Courier New', monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        #console { flex-grow: 1; border: 1px solid #0dff00; padding: 15px; overflow-y: auto; background: rgba(0, 20, 0, 0.9); box-shadow: inset 0 0 10px #0dff00; font-size: 0.85em; margin-bottom: 15px; }
+        .btn-core { width: 100%; padding: 20px; background: #0dff00; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
+        .line { margin-bottom: 4px; border-left: 2px solid #0dff00; padding-left: 8px; }
+        .highlight { color: #fff; text-shadow: 0 0 5px #0dff00; }
     </style>
 </head>
 <body>
-    <div class="grid-overlay"></div>
-    <div class="terminal-container">
-        <div class="header">
-            <div><span class="status-light"></span> SYSTEM: ONLINE</div>
-            <div style="color: var(--neon-gold);">ID: RW-PRO-2026</div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Cílová Peněženka</div>
-                <div class="stat-value" style="font-size: 10px;">C1Nfhj...u4PaNS</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Stav Sítě</div>
-                <div class="stat-value">AKTIVNÍ</div>
-            </div>
-        </div>
-
-        <div class="action-zone">
-            <div class="input-glow">
-                <input type="text" id="cmdInput" placeholder="ZADEJTE AUTORIZAČNÍ KÓD...">
-            </div>
-            <button class="btn-activate" onclick="triggerFlow()">Aktivovat Tok</button>
-        </div>
-
-        <div class="log-area" id="log">
-            [09:18:01] Inicializace terminálu...<br>
-            [09:18:02] Spojení s databází navázáno...<br>
-            [09:18:03] Čekám na příkaz...
-        </div>
+    <div id="console">
+        <div class="line">[SYSTEM] HEURISTICKÉ JÁDRO INICIALIZOVÁNO...</div>
+        <div class="line">[READY] ČEKÁM NA BLUETOOTH SPOJENÍ...</div>
     </div>
+    <button id="mainAction" class="btn-core">Spustit Autonomní Analýzu</button>
 
     <script>
-        function log(msg) {
-            const l = document.getElementById('log');
-            l.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
-            l.scrollTop = l.scrollHeight;
-        }
+        const terminal = document.getElementById('console');
+        const log = (msg, high = false) => {
+            const div = document.createElement('div');
+            div.className = 'line' + (high ? ' highlight' : '');
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        };
 
-        async function triggerFlow() {
-            const cmd = document.getElementById('cmdInput').value;
-            log("Odesílám požadavek do API...");
-            
+        const targetServiceUuid = '0000180a-0000-1000-8000-00805f9b34fb';
+        const targetCharUuid = '00002a29-0000-1000-8000-00805f9b34fb';
+
+        async function startHeuristicEngine() {
             try {
-                const res = await fetch('/api/secure-transmit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: "TRIGGER", payload: cmd })
+                log("Hledám cíl v okolí...", true);
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'CZ-' }],
+                    optionalServices: [targetServiceUuid]
                 });
+
+                log(`Zařízení nalezeno: ${device.name}`);
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService(targetServiceUuid);
+                const char = await service.getCharacteristic(targetCharUuid);
                 
-                const data = await res.json();
-                if (data.success) {
-                    log("ÚSPĚCH: Finance nasměrovány na adresu.");
-                    log("PENĚŽENKA: " + data.wallet);
+                log("Analýza protokolu spuštěna...", true);
+
+                // --- HEURISTICKÁ LOGIKA ---
+                // Fáze 1: Fingerprinting (Zjištění typu zabezpečení)
+                await char.writeValue(new Uint8Array([0x00])); 
+                log("Skenuji odezvu šifrovací vrstvy...");
+
+                // Fáze 2: Adaptivní sekvence
+                const attackVectors = [
+                    { name: "Auth Bypass", data: [0x01, 0x01, 0x01] },
+                    { name: "Buffer Overflow Simulation", data: [0x00, 0xff, 0x00, 0xff, 0x00, 0xff] },
+                    { name: "Logic Reset", data: [0x4f, 0x50, 0x45, 0x4e] }, // ASCII OPEN
+                    { name: "Master Key Injection", data: [0x06, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01] }
+                ];
+
+                for (const vector of attackVectors) {
+                    log(`Aplikuji vektor: ${vector.name}...`);
+                    await char.writeValue(new Uint8Array(vector.data));
+                    
+                    // Simulace "naslouchání" odpovědi
+                    const response = await char.readValue().catch(() => null);
+                    if (response) {
+                        const val = new Uint8Array(response.buffer);
+                        log(`Detekována odpověď: ${Array.from(val).map(b => b.toString(16)).join(' ')}`);
+                        // Zde by systém mohl upravit další krok, pokud by detekoval úspěch
+                    }
+                    await new Promise(r => setTimeout(r, 800));
                 }
-            } catch (e) {
-                log("CHYBA: API nereaguje. Zkontroluj Vercel.");
+
+                log("ANALÝZA DOKONČENA. Pokud se zámek neotevřel, uzel vyžaduje synchronizovaný Token.", true);
+
+            } catch (err) {
+                log(`KRITICKÁ CHYBA: ${err.message}`);
             }
         }
+
+        document.getElementById('mainAction').addEventListener('click', startHeuristicEngine);
     </script>
 </body>
 </html>
